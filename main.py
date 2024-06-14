@@ -133,8 +133,8 @@ async def createPosts():
             
             image_url = f"https://labs.hackthebox.com{machines_db[machine_id]['avatar']}"
 
-            image_buffer = generate_bar_graph(machines_db[machine_id]['feedback'])
-            image_file = discord.File(image_buffer, filename="bar_graph.png")
+            rating_graph_buffer = generate_bar_graph(machines_db[machine_id]['feedback'])
+            rating_graph_file = discord.File(rating_graph_buffer, filename="bar_graph.png")
                     
             os = machines_db[machine_id]['os']
             diff = machines_db[machine_id]['diff']
@@ -179,17 +179,17 @@ async def createPosts():
             post = await forum_channel.create_thread(
                 name=f"{machines_db[machine_id]['name']} - #{machine_id}",
                 embeds=[embed,rating_embed],
-                file=image_file,
+                file=rating_graph_file,
                 applied_tags=[os_tag, diff_tag]
             )
 
-            config_db['posts'][machine_id] = {'thread_id':post[0].id,'msg_id':post[1].id}
+            config_db['posts'][machine_id] = {'thread_id':post[0].id,'msg_id':post[1].id,'user_solves':machines_db[machine_id]['user_solves'],'root_solves':machines_db[machine_id]['root_solves'],'feedback':machines_db[machine_id]['feedback'],'star':machines_db[machine_id]['star']}
 
     logging.info('Retiring old posts...')
     for machine_id in posts_keys:
         if machine_id not in machines_keys:
             logging.info(f"Retiring #{machine_id}...")
-            post = await forum_channel.get_thread(config_db['posts'][machine_id]['thread_id'])
+            post = forum_channel.get_thread(config_db['posts'][machine_id]['thread_id'])
             if post:
                 await post.edit(name=f'[RETIRED] {post.name}')
                 del config_db['posts'][machine_id]
@@ -205,14 +205,14 @@ async def createPosts():
     machines_keys = machines_db.keys()
 
     for machine_id in list(machines_keys):
-        if machine_id in posts_keys and machine_id not in posts_made:
-            logging.info(f'Editing {machines_db[machine_id]["name"]}...')
+        if machine_id in posts_keys and machine_id not in posts_made and (config_db['posts'][machine_id]['user_solves'] != machines_db[machine_id]['user_solves'] or config_db['posts'][machine_id]['root_solves'] != machines_db[machine_id]['root_solves'] or config_db['posts'][machine_id]['star'] != machines_db[machine_id]['star'] or config_db['posts'][machine_id]['feedback'] != machines_db[machine_id]['feedback']):
+            logging.info(f'Editing {machines_db[machine_id]["name"]} as stats changed...')
             message_id = config_db['posts'][machine_id]['msg_id']
             thread_id = config_db['posts'][machine_id]['thread_id']
 
             image_url = f"https://labs.hackthebox.com{machines_db[machine_id]['avatar']}"
-            image_buffer = generate_bar_graph(machines_db[machine_id]['feedback'])
-            image_file = discord.File(image_buffer, filename="bar_graph.png")
+            rating_graph_buffer = generate_bar_graph(machines_db[machine_id]['feedback'])
+            rating_graph_file = discord.File(rating_graph_buffer, filename="bar_graph.png")
 
             os = machines_db[machine_id]['os']
             diff = machines_db[machine_id]['diff']
@@ -257,7 +257,7 @@ async def createPosts():
             if thread:
                 message = await thread.fetch_message(message_id)
                 if message:
-                    await message.edit(embeds=[embed,rating_embed],attachments=[image_file])
+                    await message.edit(embeds=[embed,rating_embed],attachments=[rating_graph_file])
                     
 
 
