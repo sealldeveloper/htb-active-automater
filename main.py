@@ -56,6 +56,7 @@ async def getActiveMachines():
         new_ids = set()
         logging.info('Getting new active machines...')
         for machine in machines_data['data']:
+            logging.info(machine)
             new_ids.add(machine['id'])
             if machine['id'] not in cur_ids:
                 machines_db[machine['id']] = {'name':machine['name'],'diff':machine['difficultyText'],'os':machine['os'],'avatar':machine['avatar']}
@@ -79,27 +80,50 @@ async def createPosts():
     logging.info('Making new posts...')
     for machine_id in reversed(list(machines_keys)):
         if machine_id not in posts_keys:
-
+            logging.info(f'Posting {machines_db[machine_id]["name"]}...')
             diff_tag = discord.utils.get(forum_channel.available_tags, name=machines_db[machine_id]['diff'])
             os_tag = discord.utils.get(forum_channel.available_tags, name=machines_db[machine_id]['os'])
             image_url = f"https://labs.hackthebox.com{machines_db[machine_id]['avatar']}"
-            async with ClientSession() as session:
-                async with session.get(image_url) as resp:
-                    if resp.status != 200:
-                        logging.info("ERR: Failed to download image")
-                        return
-
-                    image_data = BytesIO(await resp.read())
                     
-                    # Create a new post with the image
-                    post = await forum_channel.create_thread(
-                        name=f"{machines_db[machine_id]['name']} - #{machine_id}",
-                        content=f"This is a **{machines_db[machine_id]['os']}** box of **{machines_db[machine_id]['diff']}** difficulty.\n\nYou can attempt the box [here](https://app.hackthebox.com/machines/{machines_db[machine_id]['name'].replace(' ','%20')})\n\n**__Please do not share anything major about the box until the first 24 hours has passed, then hints are OK!__**",
-                        file=discord.File(image_data, "logo.png"),
-                        applied_tags=[os_tag, diff_tag]
-                    )
+            os = machines_db[machine_id]['os']
+            diff = machines_db[machine_id]['diff']
+            col = discord.Color.blue()
+            match diff:
+                case "Easy":
+                    col = discord.Color.brand_green()
+                case "Medium":
+                    col = discord.Color.orange()
+                case "Hard":
+                    col = discord.Color.dark_red()
+                case "Insane":
+                    col = discord.Color.light_grey()
 
-                    config_db['posts'][machine_id] = post[0].id
+            embed = discord.Embed(
+                title=f"{machines_db[machine_id]['name']} - #{machine_id}",
+                description=f"**:desktop: Operating System:** `{os}`\n**:scales: Difficulty:** `{diff}`",
+                color=col
+            )
+            embed.add_field(
+                name="Attempt the Box",
+                value=f"You can attempt the box [here](https://app.hackthebox.com/machines/{machines_db[machine_id]['name'].replace(' ','%20')})",
+                inline=False
+            )
+            embed.add_field(
+                name="Important Notice",
+                value="**__Please do not share anything major about the box until the first 24 hours has passed, then hints are OK!__**",
+                inline=False
+            )
+            embed.set_thumbnail(url=image_url)
+            embed.set_footer(text="Made by seall.dev", icon_url="https://seall.dev/images/logo.png")
+
+            # Create a new post with the image
+            post = await forum_channel.create_thread(
+                name=f"{machines_db[machine_id]['name']} - #{machine_id}",
+                embed=embed,
+                applied_tags=[os_tag, diff_tag]
+            )
+
+            config_db['posts'][machine_id] = post[0].id
     logging.info('Retiring old posts...')
     for machine_id in posts_keys:
         if machine_id not in machines_keys:
@@ -108,6 +132,7 @@ async def createPosts():
             if post:
                 await post.edit(name=f'[RETIRED] {post.name}')
                 del config_db['posts'][machine_id]
+                
     
     db.update({'config':config_db})
             
@@ -121,7 +146,7 @@ def start_update_posts_task():
 
 ### TASKS ###
 
-@tasks.loop(hours=1)
+@tasks.loop(minutes=10)
 async def update_posts():
     try:
         config_db = db.all()[0]['config']
@@ -174,9 +199,10 @@ async def slash_command(interaction: discord.Interaction):
             return await interaction.edit_original_response(content=f'Could not create forum channel!')
 
         try:
-            await interaction.edit_original_response(content=f'Making tags...')
+            await interaction.edit_original_response(content=f'Making operating system tags...')
             for tag in os_tags:
                 await forum_channel.create_tag(name=tag, moderated=False)
+            await interaction.edit_original_response(content=f'Making difficulty tags...')
             for tag in diff_tags:
                 await forum_channel.create_tag(name=tag, moderated=False)
         except:
