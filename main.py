@@ -295,7 +295,7 @@ async def update_posts():
 
 ### COMMANDS ###
 
-@tree.command(name="setupa", description="Setup the forum channel, tags and initial posts.",guild=discord.Object(id=discord_guild_id))
+@tree.command(name="setupbot", description="Setup the forum channel, tags and initial posts.",guild=discord.Object(id=discord_guild_id))
 async def slash_command(interaction: discord.Interaction):    
     await interaction.response.defer(ephemeral=True)
     logging.info(f'[{interaction.user.id}] - ran {interaction.command.name}')
