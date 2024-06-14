@@ -94,7 +94,7 @@ async def createPosts():
                     # Create a new post with the image
                     post = await forum_channel.create_thread(
                         name=f"{machines_db[machine_id]['name']} - #{machine_id}",
-                        content=f"This is a **{machines_db[machine_id]['os']}** box of **{machines_db[machine_id]['diff']}** difficulty.\n\n**__Please do not share anything major about the box until the first 24 hours has passed, then hints are OK!__**",
+                        content=f"This is a **{machines_db[machine_id]['os']}** box of **{machines_db[machine_id]['diff']}** difficulty.\n\nYou can attempt the box [here](https://app.hackthebox.com/machines/{machines_db[machine_id]['name'].replace(' ','%20')})\n\n**__Please do not share anything major about the box until the first 24 hours has passed, then hints are OK!__**",
                         file=discord.File(image_data, "logo.png"),
                         applied_tags=[os_tag, diff_tag]
                     )
