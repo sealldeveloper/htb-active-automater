@@ -1,7 +1,7 @@
 # HTB Active Machines Threads Automater
 This is a bot to get the current active HTB machines and make a forum channel with threads for easy access and communication between peers. This was made for the University CTF team I help administrate **MQCybersec**.
 
-![image](https://github.com/sealldeveloper/htb-active-automater/assets/120470330/a80d964e-af9d-4bb5-8b75-9e95c3222088)
+![image](https://github.com/sealldeveloper/htb-active-automater/assets/120470330/c3523f7a-df6c-4b91-8ab6-63f1f6d729ee)
 
 
 ## .env Setup
