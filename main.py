@@ -151,7 +151,7 @@ async def createPosts():
 
             embed = discord.Embed(
                 title=f"{machines_db[machine_id]['name']} - #{machine_id}",
-                description=f"**:desktop: Operating System:** `{os}`\n**:scales: Difficulty:** `{diff}`\n\n**:bust_in_silhouette: User Solves:** `{machines_db[machine_id]['user_solves']}`\n**:hash: Root Solves:** `{machines_db[machine_id]['root_solves']}`\n\n**:star: Rating** `{machines_db[machine_id]['star']}`",
+                description=f"**:desktop: Operating System:** `{os}`\n**:scales: Difficulty:** `{diff}`\n\n**:bust_in_silhouette: User Solves:** `{machines_db[machine_id]['user_solves']}`\n**:hash: Root Solves:** `{machines_db[machine_id]['root_solves']}`\n\n**:star: Rating:** `{machines_db[machine_id]['star']}`",
                 color=col
             )
             embed.add_field(
@@ -229,7 +229,7 @@ async def createPosts():
 
             embed = discord.Embed(
                 title=f"{machines_db[machine_id]['name']} - #{machine_id}",
-                description=f"**:desktop: Operating System:** `{os}`\n**:scales: Difficulty:** `{diff}`\n\n**:bust_in_silhouette: User Solves:** `{machines_db[machine_id]['user_solves']}`\n**:hash: Root Solves:** `{machines_db[machine_id]['root_solves']}`\n\n**:star: Rating** `{machines_db[machine_id]['star']}`",
+                description=f"**:desktop: Operating System:** `{os}`\n**:scales: Difficulty:** `{diff}`\n\n**:bust_in_silhouette: User Solves:** `{machines_db[machine_id]['user_solves']}`\n**:hash: Root Solves:** `{machines_db[machine_id]['root_solves']}`\n\n**:star: Rating:** `{machines_db[machine_id]['star']}`",
                 color=col
             )
             embed.add_field(
